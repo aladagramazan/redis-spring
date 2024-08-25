@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 @Service
 public class CityClient {
 
-    private final WebClient client;
+   /* private final WebClient client;
 
     public CityClient(@Value("${city.service.url}") String url) {
         this.client = WebClient.builder()
@@ -30,4 +30,6 @@ public class CityClient {
                 .retrieve()
                 .bodyToFlux(City.class);
     }
+
+    */
 }

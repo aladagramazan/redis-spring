@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+    <title>Turkey City Locator</title>
+</head>
+<body style="background-color: #E5E7E9;">
+<div class="container mt-5">
+    <h2>Turkey City Locator</h2>
+
+    <form>
+        <div class="row">
+            <div class="col">
+                <input type="text" class="form-control" placeholder="Plaka" id='plaka'>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-primary form-control" id='search'>Search</button>
+            </div>
+        </div>
+    </form>
+    <div id="map" class="mt-5" style="height:600px; width:700px"></div>
+</div>
+
+<script type="text/javascript">
+    let markers = [];
+    function initMap() {
+        const turkeyCenter = { lat: 39.9334, lng: 32.8597 }; // Centered on Turkey
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 6,
+            center: turkeyCenter,
+        });
+
+        const updateMap = async () => {
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+            const plaka = document.getElementById('plaka').value;
+            const uri = `http://localhost:8031/turkey/${plaka}`;
+            const response = await fetch(uri);
+            const arr = await response.json();
+
+            if (arr.length > 0) {
+                map.setZoom(6);
+                map.setCenter({
+                    lat: parseFloat(arr[0].lat),
+                    lng: parseFloat(arr[0].lon)
+                });
+            }
+
+            arr.forEach(r => {
+                const marker = new google.maps.Marker({
+                    position: { lat: parseFloat(r.lat), lng: parseFloat(r.lon) },
+                    map: map,
+                    title: r.il_adi
+                });
+                markers.push(marker);
+            });
+        }
+
+        document.getElementById('search').addEventListener('click', updateMap);
+    }
+</script>
+<script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhWuMAcRCU1R7rC67rFPgYo4MqMeyxM3U&callback=initMap&libraries=&v=weekly&channel=2"
+        async
+></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+</body>
+</html>
